@@ -332,7 +332,7 @@ class Application(object):
         x = unescape(xml_string, {"&apos;": "'", "&quot;": '"'})
         return _parse_xml_string(x, charset)
 
-    def decompose_incoming_envelope(self, ctx, envelope_xml, xmlids=None):
+    def decompose_incoming_envelope(self, ctx, envelope_xml, xmlids=None, req_env=None):
         header, body = _from_soap(envelope_xml, xmlids)
 
         # FIXME: find a way to include soap env schema with soaplib package and
@@ -368,13 +368,13 @@ class Application(object):
                 logger.debug(traceback.format_exc())
                 raise ValidationError('Client', 'Method not found: %r' %
                                                                 ctx.method_name)
-
-            ctx.service = self.get_service(ctx.service_class)
+            
+            ctx.service = self.get_service(ctx.service_class, req_env)
 
             ctx.in_header_xml = header
             ctx.in_body_xml = body
 
-    def deserialize_soap(self, ctx, wrapper, envelope_xml, xmlids=None):
+    def deserialize_soap(self, ctx, wrapper, envelope_xml, xmlids=None, req_env=None):
         """Takes a MethodContext instance and a string containing ONE soap
         message.
         Returns the corresponding native python object
@@ -386,7 +386,7 @@ class Application(object):
                                                 Application.OUT_WRAPPER),wrapper
 
         # this sets the ctx.in_body_xml and ctx.in_header_xml properties
-        self.decompose_incoming_envelope(ctx, envelope_xml, xmlids)
+        self.decompose_incoming_envelope(ctx, envelope_xml, xmlids, req_env)
 
         if ctx.in_body_xml.tag == "{%s}Fault" % namespaces.ns_soap_env:
             in_body = Fault.from_xml(ctx.in_body_xml)
@@ -429,7 +429,6 @@ class Application(object):
 
         Not meant to be overridden.
         """
-
         try:
             # implementation hook
             ctx.service.on_method_call(ctx.method_name,req_obj,ctx.in_body_xml)

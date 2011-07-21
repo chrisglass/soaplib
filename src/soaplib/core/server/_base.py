@@ -41,13 +41,13 @@ class Base(object):
         self.app = app
         self.app.transport = self.transport
 
-    def get_in_object(self, ctx, in_string, in_string_charset=None):
+    def get_in_object(self, ctx, in_string, in_string_charset=None, req_env=None):
         in_object = None
         root, xmlids = self.app.parse_xml_string(in_string, in_string_charset)
 
         try:
             in_object = self.app.deserialize_soap(ctx, self.app.IN_WRAPPER,
-                                                                   root, xmlids)
+                                                                   root, xmlids, req_env)
         except Fault,e:
             ctx.in_error = e
 

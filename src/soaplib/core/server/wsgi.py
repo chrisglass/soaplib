@@ -131,7 +131,7 @@ class Application(Base):
 
         in_string, in_string_charset = _reconstruct_soap_request(req_env)
 
-        in_object = self.get_in_object(ctx, in_string, in_string_charset)
+        in_object = self.get_in_object(ctx, in_string, in_string_charset, req_env)
 
         return_code = HTTP_200
         if ctx.in_error:
