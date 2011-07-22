@@ -51,7 +51,7 @@ class Fault(Exception, Base):
         etree.SubElement(element, 'faultstring').text = value.faultstring
         etree.SubElement(element, 'faultactor').text = value.faultactor
         if value.detail != None:
-            etree.SubElement(element, 'detail').append(value.detail)
+            etree.SubElement(element, 'detail').text = value.detail
 
     def add_to_parent_element(self, tns, parent):
         self.__class__.to_parent_element(self, tns, parent, name=None)
